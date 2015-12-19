@@ -2,8 +2,6 @@
 
 #### Add a little high availability to your Go functions or methods.
 
----
-
 ## Example
 ```go
 package main
