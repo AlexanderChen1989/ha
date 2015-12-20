@@ -23,17 +23,17 @@ func recoverWrapper(fn func()) (err error) {
 }
 
 type config struct {
-	max     uint
-	noLimit bool
-	wait    time.Duration
-	onStop  func(error)
-	ctx     context.Context
+	maxRestart   uint
+	noLimit      bool
+	restartDelay time.Duration
+	onStop       func(error)
+	cancelCtx    context.Context
 }
 
-// Context when ctx cancled, fn will not restart again
-func Context(ctx context.Context) func(conf *config) {
+// CancelCtx when ctx cancled, fn will not restart again
+func CancelCtx(ctx context.Context) func(conf *config) {
 	return func(conf *config) {
-		conf.ctx = ctx
+		conf.cancelCtx = ctx
 	}
 }
 
@@ -44,27 +44,27 @@ func OnStop(onStop func(error)) func(conf *config) {
 	}
 }
 
-// Max max restart times
-func Max(max uint) func(conf *config) {
+// MaxRestart max restart times
+func MaxRestart(max uint) func(conf *config) {
 	return func(conf *config) {
 		conf.noLimit = false
-		conf.max = max
+		conf.maxRestart = max
 	}
 }
 
-// Wait wait for d time before rerun fn
-func Wait(d time.Duration) func(conf *config) {
+// RestartDelay wait for d time before restart fn
+func RestartDelay(d time.Duration) func(conf *config) {
 	return func(conf *config) {
-		conf.wait = d
+		conf.restartDelay = d
 	}
 }
 
 // Watch run then watch fn, if fn returned, run it again
 func Watch(fn func(), setups ...func(*config)) {
 	conf := &config{
-		noLimit: true,
-		onStop:  func(error) {},
-		ctx:     context.Background(),
+		noLimit:   true,
+		onStop:    func(error) {},
+		cancelCtx: context.Background(),
 	}
 	for _, setup := range setups {
 		setup(conf)
@@ -72,15 +72,15 @@ func Watch(fn func(), setups ...func(*config)) {
 	for {
 		conf.onStop(recoverWrapper(fn))
 		select {
-		case <-conf.ctx.Done():
+		case <-conf.cancelCtx.Done():
 			return
 		default:
 		}
-		time.Sleep(conf.wait)
+		time.Sleep(conf.restartDelay)
 		if conf.noLimit {
 			continue
 		}
-		if conf.max--; conf.max <= 0 {
+		if conf.maxRestart--; conf.maxRestart <= 0 {
 			return
 		}
 	}
