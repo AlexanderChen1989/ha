@@ -1,7 +1,16 @@
 # HA For Go
 
 #### Add a little high availability to your Go functions or methods.
-
+## Simple Usage
+```go
+ha.Watch(func() {...})
+ha.Watch(
+	func() {...},
+	ha.RestartDelay(time.Second),
+	// ha.MaxRestart(5),
+	// ha.CancelCtx(ctx),
+ )
+```
 ## Example
 ```go
 package main
@@ -28,10 +37,10 @@ func main() {
 	})
 
 	// try to restart fn at most 5 times
-	max := ha.Max(5)
+	max := ha.MaxRestart(5)
 
 	// wait sometime before restart fn
-	wait := ha.Wait(1 * time.Second)
+	delay := ha.RestartDelay(1 * time.Second)
 
 	// context to stop restarting fn
 	ctx, cancel := context.WithCancel(context.Background())
@@ -42,6 +51,8 @@ func main() {
 		cancel()
 	}()
 
-	ha.Watch(fn, onStop, wait, max, ha.Context(ctx))
+	ha.Watch(fn, onStop, delay, max, ha.CancelCtx(ctx))
 }
+
+
 ```

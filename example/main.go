@@ -25,7 +25,7 @@ func main() {
 	max := ha.MaxRestart(5)
 
 	// wait sometime before restart fn
-	wait := ha.RestartDelay(1 * time.Second)
+	delay := ha.RestartDelay(1 * time.Second)
 
 	// context to stop restarting fn
 	ctx, cancel := context.WithCancel(context.Background())
@@ -36,5 +36,5 @@ func main() {
 		cancel()
 	}()
 
-	ha.Watch(fn, onStop, wait, max, ha.CancelCtx(ctx))
+	ha.Watch(fn, onStop, delay, max, ha.CancelCtx(ctx))
 }
