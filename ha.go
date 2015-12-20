@@ -14,7 +14,7 @@ func recoverWrapper(fn func()) (err error) {
 		case error:
 			err = e
 		case interface{}:
-			err = fmt.Errorf("%s", err)
+			err = fmt.Errorf("%s", e)
 		}
 	}()
 
