@@ -44,8 +44,8 @@ func OnStop(onStop func(error)) func(conf *config) {
 	}
 }
 
-// MaxRestart max restart times
-func MaxRestart(max uint) func(conf *config) {
+// RestartTimes max restart times
+func RestartTimes(max uint) func(conf *config) {
 	return func(conf *config) {
 		conf.noLimit = false
 		conf.maxRestart = max

@@ -22,7 +22,7 @@ func main() {
 	})
 
 	// try to restart fn at most 5 times
-	max := ha.MaxRestart(5)
+	max := ha.RestartTimes(5)
 
 	// wait sometime before restart fn
 	delay := ha.RestartDelay(1 * time.Second)
