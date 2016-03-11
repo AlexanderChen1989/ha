@@ -11,6 +11,23 @@ ha.Watch(
 	// ha.CancelCtx(ctx),
  )
 ```
+## Caution!
+Panic in goroutine may panic runtime! Watch is only watch current goroutine.
+```go
+	Watch(func() {
+		go func() {
+			panic("No!!") // Will panic runtime
+		}()
+	})
+
+	// you can do this
+	// func will be restart when panic happened
+	go Watch(func() {
+		panic("No!!")
+	})
+```
+
+
 ## Example
 ```go
 package main
